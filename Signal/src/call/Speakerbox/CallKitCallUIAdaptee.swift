@@ -217,9 +217,6 @@ final class CallKitCallUIAdaptee: NSObject, CallUIAdaptee, CXProviderDelegate {
         AssertIsOnMainThread()
         Logger.info("\(self.TAG) \(#function)")
 
-        // Stop any in-progress WebRTC related audio.
-        PeerConnectionClient.stopAudioSession()
-
         // End any ongoing calls if the provider resets, and remove them from the app's list of calls,
         // since they are no longer valid.
         callService.handleFailedCurrentCall(error: .providerReset)
@@ -305,7 +302,7 @@ final class CallKitCallUIAdaptee: NSObject, CallUIAdaptee, CXProviderDelegate {
         // Stop or start audio in response to holding or unholding the call.
         if call.isOnHold {
             // stopAudio() <-- SpeakerBox
-            PeerConnectionClient.stopAudioSession()
+
         } else {
             // startAudio() <-- SpeakerBox
             // This is redundant with what happens in `provider(_:didActivate:)`
@@ -355,8 +352,8 @@ final class CallKitCallUIAdaptee: NSObject, CallUIAdaptee, CXProviderDelegate {
 
         Logger.debug("\(TAG) Received \(#function)")
 
-        // Start recording
-        PeerConnectionClient.startAudioSession()
+        // Audio Session is managed by CallAudioService, which observes changes on the
+        // SignalCall directly.
     }
 
     func provider(_ provider: CXProvider, didDeactivate audioSession: AVAudioSession) {
@@ -364,10 +361,8 @@ final class CallKitCallUIAdaptee: NSObject, CallUIAdaptee, CXProviderDelegate {
 
         Logger.debug("\(TAG) Received \(#function)")
 
-        /*
-         Restart any non-call related audio now that the app's audio session has been
-         de-activated after having its priority restored to normal.
-         */
+        // Audio Session is managed by CallAudioService, which observes changes on the
+        // SignalCall directly.
     }
 
     // MARK: - Util
